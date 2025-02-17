@@ -33,12 +33,12 @@ class Server:
 
     def broadcast_message(self, sender_name: str, message: str):
         """Broadcast a message to all clients."""
-        full_message = f"{sender_name}: {message}"
-        print(full_message)
-        for client in self.clients.values():
+        fullMessage = f"{sender_name}: {message}"
+        print(fullMessage)
+        for clientName, client in self.clients.values():
             try:
-                if client.username != sender_name:
-                    client.send(full_message.encode())
+                if clientName != sender_name:
+                    client.send(fullMessage.encode())
             except Exception as e:
                 print(f"Error sending message to {client.username}: {e}")
 
