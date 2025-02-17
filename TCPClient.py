@@ -5,17 +5,23 @@ import threading
 import sys
 from dotenv import load_dotenv
 
+# --- Internal Libraries ---
+from encrypt import Encrypt, Decrypt
+
 
 # --- Client Class ---
 class Client:
     def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.host, self.port))
+        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientSocket.connect((self.host, self.port))
 
-        self.username = input("Entrez votre pseudo : ")
-        self.client_socket.send(self.username.encode())  # Envoi du pseudo au serveur
+        self.username = input("Enter your username : ")
+        self.clientSocket.send(self.username.encode())  # Envoi du pseudo au serveur
+        
+        self.symetricKey = self.clientSocket.recv(1024).decode()
+        print(f"Symetric key : {self.symetricKey}")
         
         # Lancer le thread pour la réception des messages
         threading.Thread(target=self.receive_messages, daemon=True).start()
@@ -24,16 +30,18 @@ class Client:
         """Receive messages from the server."""
         try:
             while True:
-                message = self.client_socket.recv(1024).decode()
-                if not message:
+                encryptedMessage = self.clientSocket.recv(1024).decode()
+                if not encryptedMessage:
                     break
+                
+                message = Decrypt.vigenere(encryptedMessage, self.symetricKey)
                 print("\n" + message)
         except ConnectionResetError:
             print("\nConnexion perdue avec le serveur.")
         except Exception as e:
             print(f"\nErreur de réception : {e}")
         finally:
-            self.client_socket.close()
+            self.clientSocket.close()
             sys.exit(0)  # Quitter proprement
 
     def send_message(self):
@@ -41,24 +49,25 @@ class Client:
         try:
             while True:
                 message = input(f"{self.username}: ")
-                self.client_socket.send(f"{message}".encode())
+                encryptedMessage = Encrypt.vigenere(message, self.symetricKey)
+                self.clientSocket.send(f"{encryptedMessage}".encode())
         except KeyboardInterrupt:
             print("\nDéconnexion en cours...")
         finally:
-            self.client_socket.close()
+            self.clientSocket.close()
             sys.exit(0)
 
     def run(self):
         """Start the client and send messages."""
         try:
             # Lancer l'envoi dans un thread
-            send_thread = threading.Thread(target=self.send_message, daemon=True)
-            send_thread.start()
-            send_thread.join()  # Attendre que l'envoi se termine
+            sendThread = threading.Thread(target=self.send_message, daemon=True)
+            sendThread.start()
+            sendThread.join()  # Attendre que l'envoi se termine
         except KeyboardInterrupt:
             print("\nDéconnexion forcée.")
         finally:
-            self.client_socket.close()
+            self.clientSocket.close()
             sys.exit(0)
 
 

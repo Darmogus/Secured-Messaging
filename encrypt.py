@@ -10,7 +10,12 @@ class CipherBase:
     @staticmethod
     def _shift_char(char: str, shift: int) -> str:
         """Shift a character by a given number of positions in the alphabet."""
-        return CipherBase.ALPHABET[(CipherBase.ALPHABET_DICT[char] + shift) % 26]
+        if char.lower() in CipherBase.ALPHABET_DICT:
+            is_upper = char.isupper()
+            new_char = CipherBase.ALPHABET[(CipherBase.ALPHABET_DICT[char.lower()] + shift) % 26]
+            return new_char.upper() if is_upper else new_char
+        return char  # Si le caractère n'est pas dans l'alphabet, on le laisse tel quel.
+
 
     @staticmethod
     def _generate_vigenere_key(message: str, key: str) -> list[str]:
@@ -71,29 +76,3 @@ class Decrypt(CipherBase):
         decryptedMessage: str = "".join(listMessage)
         return decryptedMessage
         
-        
-# --- Main ---
-def main():
-    message = "hello"
-    cesar_key = "3"
-    vigenere_key = "key"
-
-    # Encrypt using Caesar cipher
-    encrypted_cesar = Encrypt.cesar(message, cesar_key)
-    print(f"Encrypted with Caesar: {encrypted_cesar}")
-
-    # Decrypt using Caesar cipher
-    decrypted_cesar = Decrypt.cesar(encrypted_cesar, cesar_key)
-    print(f"Decrypted with Caesar: {decrypted_cesar}")
-
-    # Encrypt using Vigenère cipher
-    encrypted_vigenere = Encrypt.vigenere(message, vigenere_key)
-    print(f"Encrypted with Vigenère: {encrypted_vigenere}")
-
-    # Decrypt using Vigenère cipher
-    decrypted_vigenere = Decrypt.vigenere(encrypted_vigenere, vigenere_key)
-    print(f"Decrypted with Vigenère: {decrypted_vigenere}")
-
-if __name__ == "__main__":
-    main()
-    
