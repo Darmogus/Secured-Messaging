@@ -21,7 +21,7 @@ class Client:
         threading.Thread(target=self.receive_messages, daemon=True).start()
 
     def receive_messages(self):
-        """Reçoit et affiche les messages entrants."""
+        """Receive messages from the server."""
         try:
             while True:
                 message = self.client_socket.recv(1024).decode()
@@ -37,11 +37,11 @@ class Client:
             sys.exit(0)  # Quitter proprement
 
     def send_message(self):
-        """Envoie des messages au serveur."""
+        """Send messages to the server."""
         try:
             while True:
                 message = input("Message : ")
-                self.client_socket.send(f"{self.username}:{message}".encode())
+                self.client_socket.send(f"{message}".encode())
         except KeyboardInterrupt:
             print("\nDéconnexion en cours...")
         finally:
@@ -49,7 +49,7 @@ class Client:
             sys.exit(0)
 
     def run(self):
-        """Lance l'envoi et la réception des messages en parallèle."""
+        """Start the client and send messages."""
         try:
             # Lancer l'envoi dans un thread
             send_thread = threading.Thread(target=self.send_message, daemon=True)
