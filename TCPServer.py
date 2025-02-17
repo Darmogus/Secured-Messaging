@@ -4,6 +4,7 @@ import socket
 import threading
 from dotenv import load_dotenv
 
+# TODO : lorsqu'un utilisateur se déconnecte, envoyer un message sur le groupe pour informer les autres utilisateurs
 
 # --- Server Class ---
 class Server:
@@ -36,7 +37,8 @@ class Server:
         print(full_message)
         for client in self.clients.values():
             try:
-                client.send(full_message.encode())
+                if client.username != sender_name:
+                    client.send(full_message.encode())
             except Exception as e:
                 print(f"Error sending message to {client.username}: {e}")
 
