@@ -1,7 +1,12 @@
+# --- External libraries ---
+import os
 import socket
+from dotenv import load_dotenv
 
+
+# --- Classes ---
 class TCPClient:
-    def __init__(self, host='127.0.0.1', port=12345):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,5 +26,6 @@ class TCPClient:
 
 # Lancer le client
 if __name__ == "__main__":
-    client = TCPClient()
+    load_dotenv()
+    client = TCPClient(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
     client.send_message("Bonjour, serveur !")
