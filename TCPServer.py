@@ -28,13 +28,11 @@ class Server:
                 if not message:
                     break
                 
-                print(f"Message reçu de {client_name}: {message}")
+                print(f"{client_name}: {message}")
                 
-                recipient, msg = message.split(":", 1)  # Format: "destinataire:message"
-                if recipient in self.clients:
-                    self.clients[recipient].send(f"{client_name}: {msg}".encode())
-                else:
-                    client_socket.send("Utilisateur introuvable.".encode())
+                _, msg = message.split(":", 1)  # Format: "destinataire:message"
+                for client in self.clients.values():
+                    client.send(f"{client_name}: {msg}".encode())
 
         except ConnectionResetError:
             print(f"{client_name} s'est déconnecté.")
