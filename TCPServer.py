@@ -35,7 +35,7 @@ class Server:
         """Broadcast a message to all clients."""
         fullMessage = f"{sender_name}: {message}"
         print(fullMessage)
-        for clientName, client in self.clients.values():
+        for clientName, client in self.clients.items():
             try:
                 if clientName != sender_name:
                     client.send(fullMessage.encode())
