@@ -40,7 +40,7 @@ class Client:
         """Send messages to the server."""
         try:
             while True:
-                message = input("Message : ")
+                message = input()
                 self.client_socket.send(f"{message}".encode())
         except KeyboardInterrupt:
             print("\nDéconnexion en cours...")
