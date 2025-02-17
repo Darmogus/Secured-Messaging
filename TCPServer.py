@@ -1,45 +1,59 @@
 # --- External Libraries ---
 import os
 import socket
+import threading
 from dotenv import load_dotenv
 
 
-# --- Classes ---
-class TCPServer:
+# --- Server Class ---
+class Server:
     def __init__(self, host, port):
         self.host = host
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((self.host, self.port))
-        self.server_socket.listen(5)  # Jusqu'à 5 connexions en attente
+        self.server_socket.listen(5)  # Max 5 connexions simultanées
+        self.clients = {}  # Dictionnaire pour stocker les connexions des clients
         print(f"Serveur en écoute sur {self.host}:{self.port}")
 
-    def handle_client(self, client_socket, address):
+    def handle_client(self, client_socket, client_address):
         """Gère la communication avec un client."""
-        print(f"Connexion établie avec {address}")
-        
-        data = client_socket.recv(1024).decode()
-        print(f"Message reçu : {data}")
-        
-        response = "Message bien reçu !"
-        client_socket.send(response.encode())  # Envoyer une réponse
-        
-        client_socket.close()
-        print(f"Connexion fermée avec {address}")
+        client_name = client_socket.recv(1024).decode()  # Récupérer le pseudo du client
+        self.clients[client_name] = client_socket
+        print(f"{client_name} ({client_address}) connecté.")
 
-    def run(self):
-        """Démarre le serveur et gère les connexions clients."""
         try:
             while True:
-                client_socket, address = self.server_socket.accept()  # Accepter un client
-                self.handle_client(client_socket, address)  # Gérer la communication
-        except KeyboardInterrupt:
-            print("\nArrêt du serveur.")
+                message = client_socket.recv(1024).decode()
+                if not message:
+                    break
+                
+                print(f"Message reçu de {client_name}: {message}")
+                
+                recipient, msg = message.split(":", 1)  # Format: "destinataire:message"
+                if recipient in self.clients:
+                    self.clients[recipient].send(f"{client_name}: {msg}".encode())
+                else:
+                    client_socket.send("Utilisateur introuvable.".encode())
+
+        except ConnectionResetError:
+            print(f"{client_name} s'est déconnecté.")
+        finally:
+            del self.clients[client_name]
+            client_socket.close()
+
+    def run(self):
+        """Démarre le serveur."""
+        try:
+            while True:
+                client_socket, client_address = self.server_socket.accept()
+                threading.Thread(target=self.handle_client, args=(client_socket, client_address)).start()
         finally:
             self.server_socket.close()
 
-# Lancer le serveur
+
+# --- Tests ---
 if __name__ == "__main__":
     load_dotenv()
-    server = TCPServer(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
+    server = Server(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
     server.run()
