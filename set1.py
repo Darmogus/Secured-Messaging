@@ -1,5 +1,6 @@
-# --- Set 1 : Hex to Base64 ---
-class Set1:
+
+class Challenge1:
+    """Hex to Base64"""
     BASE64_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     def __init__(self, hexString: str = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"):
         
@@ -38,6 +39,11 @@ class Set1:
             base64String = "=" + base64String
         
         return base64String
+
+
+class Set2:
+    ...
+
 
 def main():
     Set1()
