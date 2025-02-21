@@ -140,10 +140,9 @@ class Challenge5(Challenge):
         return ciphertext.hex()
     
 
-import base64
-
-class Challenge6:
+class Challenge6(Challenge):
     def __init__(self, file_path):
+        super().__init__(6)
         self.file_path = file_path
         self.ciphertext = self._load_and_decode_file()
         
