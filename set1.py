@@ -1,5 +1,6 @@
 import base64
 from Crypto.Cipher import AES
+from collections import Counter
 
 class Challenge:
     def __init__(self, number: int):
@@ -63,23 +64,21 @@ class Challenge2(Challenge):
         int2 = int(hexString2, 16)
         
         xorResult = int1 ^ int2
-        
         xorHex = hex(xorResult)[2:]  # Removing 0x
-        
         xorHex = xorHex.zfill(len(hexString1)) # Padding
         
         return xorHex
 
 
 class Challenge3(Challenge):
-    def __init__(self, hex_str = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736", usedElsewhere = False):
+    def __init__(self, hexStr = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736", usedElsewhere = False):
         super().__init__(3) if not usedElsewhere else None
-        self.hex_str = hex_str
+        self.hexStr = hexStr
         
         print(self.decrypt_xor_cipher()) if not usedElsewhere else None
 
     def hex_to_bytes(self):
-        return bytes.fromhex(self.hex_str)
+        return bytes.fromhex(self.hexStr)
 
     def single_byte_xor(self, input_bytes, key):
         return bytes([b ^ key for b in input_bytes])
@@ -90,37 +89,37 @@ class Challenge3(Challenge):
 
     def decrypt_xor_cipher(self):
         ciphertext = self.hex_to_bytes()
-        best_score = 0
-        best_plaintext = None
-        best_key = None
+        bestScore = 0
+        bestPlaintext = None
+        bestKey = None
 
         for key in range(256):
             plaintext = self.single_byte_xor(ciphertext, key)
             try:
-                decoded_text = plaintext.decode('utf-8')
-                score = self.score_text(decoded_text)
-                if score > best_score:
-                    best_score = score
-                    best_plaintext = decoded_text
-                    best_key = key
+                decodedText = plaintext.decode('utf-8')
+                score = self.score_text(decodedText)
+                if score > bestScore:
+                    bestScore = score
+                    bestPlaintext = decodedText
+                    bestKey = key
             except UnicodeDecodeError:
                 continue
 
-        return best_key, best_plaintext
+        return bestKey, bestPlaintext
                
 
 class Challenge4(Challenge):
-    def __init__(self, data_file: str = "set1_chall4_data.txt"):
+    def __init__(self, dataFile: str = "set1_chall4_data.txt"):
         super().__init__(4)
         try:
-            with open(data_file, 'r') as file:
+            with open(dataFile, 'r') as file:
                 for line in file:
                     challenge = Challenge3(line, True)
                     result = challenge.decrypt_xor_cipher()
                     if result[0] is not None:
                         print(result)
         except FileNotFoundError:
-            print(f"Erreur : fichier {data_file} introuvable.")
+            print(f"Erreur : fichier {dataFile} introuvable.")
             
 
 class Challenge5(Challenge):
@@ -133,10 +132,10 @@ class Challenge5(Challenge):
 
     def repeating_key_xor(self):
         ciphertext = bytearray()
-        key_length = len(self.key)
+        keyLength = len(self.key)
 
         for i, char in enumerate(self.plaintext):
-            ciphertext.append(ord(char) ^ ord(self.key[i % key_length]))  # XOR avec la clé répétée
+            ciphertext.append(ord(char) ^ ord(self.key[i % keyLength]))  # XOR avec la clé répétée
 
         return ciphertext.hex()
     
@@ -158,9 +157,48 @@ class Challenge7(Challenge):
     @staticmethod
     def load_base64_file(filename):
         with open(filename, 'r') as file:
-            base64_content = file.read()
-        return base64.b64decode(base64_content)  # Décodage Base64
+            base64Content = file.read()
+        return base64.b64decode(base64Content)  # Décodage Base64
 
+
+class Challenge8:
+    def __init__(self, filePath: str = "set1_chall8_data.txt"):
+        self.filePath = filePath
+        
+        ciphertexts = self.read_hex_file()
+        index, ecb_ciphertext = self.detect_ecb_cipher(ciphertexts)
+        
+        print(f"ECB détecté dans le texte chiffré à l'index {index}:")
+        print(ecb_ciphertext.hex())
+    
+    def detect_ecb_cipher(self, ciphertexts: list) -> tuple:
+        for idx, ciphertext in enumerate(ciphertexts):
+            blocks = [ciphertext[i:i+16] for i in range(0, len(ciphertext), 16)]  # Diviser en blocs de 16 bytes
+            blockCounts = Counter(blocks)  # Compter les occurrences des blocs
+            # Si un bloc apparaît plus d'une fois, c'est probablement du ECB
+            if any(count > 1 for count in blockCounts.values()):
+                return idx, ciphertext  # Retourne l'index et le texte chiffré
+
+    def safe_hex_decode(self, hexStr: str) -> bytes:
+        # Supprimer les espaces et caractères invisibles
+        hexStr = ''.join([c for c in hexStr if c in '0123456789abcdefABCDEF'])
+        # Vérifier si la longueur est paire avant de décoder
+        if len(hexStr) % 2 != 0:
+            raise ValueError(f"Invalid hex string: {hexStr} (length must be even)")
+        return bytes.fromhex(hexStr)
+
+    def read_hex_file(self) -> list:
+        # Lire chaque ligne du fichier et décoder les hex
+        ciphertexts = []
+        with open(self.filePath, 'r') as file:
+            for line in file:
+                line = line.strip()  # Enlever les espaces ou les retours à la ligne
+                if line:  # Si la ligne n'est pas vide
+                    try:
+                        ciphertexts.append(self.safe_hex_decode(line))
+                    except ValueError as e:
+                        print(f"Erreur dans la ligne: {e}")
+        return ciphertexts
 
 
 def main():
@@ -170,6 +208,7 @@ def main():
     Challenge4()
     Challenge5("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal", "ICE").repeating_key_xor()
     Challenge7("YELLOW SUBMARINE").decrypt_aes_ecb(Challenge7.load_base64_file("set1_chall7_data.txt"))
+    Challenge8()
     
 
 if __name__ == "__main__":
