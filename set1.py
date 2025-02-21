@@ -140,6 +140,50 @@ class Challenge5(Challenge):
         return ciphertext.hex()
     
 
+import base64
+
+class Challenge6:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.ciphertext = self._load_and_decode_file()
+        
+        self.decrypt()
+        
+    def _load_and_decode_file(self):
+        """Charge le fichier Base64 et le décode en texte chiffré (bytes)."""
+        with open(self.file_path, "r") as file:
+            base64_encoded_text = file.read().replace("\n", "")
+            return base64.b64decode(base64_encoded_text)
+    
+    def hamming_distance(self, str1, str2):
+        """Calcul la distance de Hamming entre deux chaînes de bytes."""
+        return sum(bin(a ^ b).count('1') for a, b in zip(str1, str2))
+    
+    def find_keysize(self):
+        """Trouve la taille de clé la plus probable en testant différentes tailles."""
+        min_distance = float('inf')
+        best_keysize = 0
+        for keysize in range(2, 41):
+            distances = []
+            for i in range(0, len(self.ciphertext), keysize):
+                block1 = self.ciphertext[i:i + keysize]
+                block2 = self.ciphertext[i + keysize:i + 2 * keysize]
+                if len(block1) == keysize and len(block2) == keysize:
+                    dist = self.hamming_distance(block1, block2) / keysize
+                    distances.append(dist)
+            avg_distance = sum(distances) / len(distances)
+            if avg_distance < min_distance:
+                min_distance = avg_distance
+                best_keysize = keysize
+        return best_keysize
+    
+    def decrypt(self):
+        """Démarre le processus pour trouver la clé et décrypter le texte chiffré."""
+        keysize = self.find_keysize()
+        print(f"La meilleure taille de clé estimée est : {keysize}")
+        # Ajoutez d'autres étapes ici pour casser le chiffrement avec la clé trouvée.
+
+
 class Challenge7(Challenge):
     def __init__(self, key):
         super().__init__(7)
@@ -161,8 +205,9 @@ class Challenge7(Challenge):
         return base64.b64decode(base64Content)  # Décodage Base64
 
 
-class Challenge8:
+class Challenge8(Challenge):
     def __init__(self, filePath: str = "set1_chall8_data.txt"):
+        super().__init__(8)
         self.filePath = filePath
         
         ciphertexts = self.read_hex_file()
@@ -207,6 +252,7 @@ def main():
     Challenge3().decrypt_xor_cipher()
     Challenge4()
     Challenge5("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal", "ICE").repeating_key_xor()
+    Challenge6("set1_chall6_data.txt")
     Challenge7("YELLOW SUBMARINE").decrypt_aes_ecb(Challenge7.load_base64_file("set1_chall7_data.txt"))
     Challenge8()
     
