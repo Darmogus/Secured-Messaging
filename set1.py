@@ -1,13 +1,17 @@
+# --- External librairies ---
+import nltk
+from nltk.corpus import words
+
 
 class Challenge1:
     """Hex to Base64"""
     BASE64_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     def __init__(self, hexString: str = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"):
-        
-        print(f"Hex string = {hexString}")
         binList: list[str] = self.convert_to_bin(hexString)
         byteList: list[str] = self.convert_to_bytes(binList)
         base64String: str = self.convert_to_base64(byteList)
+        
+        print(f"Hex string = {hexString}")
         print(f"Base64 string = {base64String}")
 
     def convert_to_bin(self, hexString: str) -> list[str]:
@@ -31,7 +35,7 @@ class Challenge1:
         base64String: str = ""
         for byteChar in byteList:
             binValue: int = int(byteChar, 2)
-            base64Char: str = Set1.BASE64_TABLE[binValue]
+            base64Char: str = Challenge1.BASE64_TABLE[binValue]
             base64String += base64Char
         
         # Ensure the base64 string length is a multiple of 4 by adding '=' padding
@@ -41,12 +45,73 @@ class Challenge1:
         return base64String
 
 
-class Set2:
-    ...
+class Challenge2:
+    """Fixed XOR"""
+    def __init__(self, hexString1: str = "1c0111001f010100061a024b53535009181c", hexString2: str = "686974207468652062756c6c277320657965"):
+        hexOutput = self.xor(self, hexString1, hexString2)
+        
+        print(hexString1)
+        print(hexString2)
+        print(hexOutput)
+        
+    def xor(self, hexString1, hexString2) -> str:
+        int1 = int(hexString1, 16)
+        int2 = int(hexString2, 16)
+        
+        xorResult = int1 ^ int2
+        
+        xorHex = hex(xorResult)[2:]  # Removing 0x
+        
+        xorHex = xorHex.zfill(len(self.hexString1)) # Padding
+        
+        return xorHex
+
+
+class Challenge3:
+    def __init__(self, binString: str = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"):
+        nltk.download('words', quiet=True)
+        self.english_words = set(words.words()) 
+        
+        self.binString = binString
+        self.byte_data = bytes.fromhex(self.binString)
+
+        self.find_key()
+            
+    def is_mostly_english(self, text, threshold=0.4):
+        english_word_count = sum(1 for word in text if word.lower() in self.english_words)
+        return (english_word_count / len(text)) >= threshold
+            
+    def xor_message(self, key):
+        decodedString = ""
+
+        for byte in self.byte_data:
+            decodedString += chr(byte ^ key)
+
+        if not all(char in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .',!?-" for char in decodedString):
+            return None
+        return decodedString
+    
+    def find_key(self):
+        for key in range(100):
+            decodedString: str = self.xor_message(key)
+            if decodedString:
+                print(f"Key {key}: {decodedString}")
+                
+
+class Challenge4:
+    def __init__(self, data_file: str = "set1_chall4_data.txt"):
+        try:
+            with open(data_file, 'r') as file:
+                for line in file:
+                    strippedLine: str = line.strip()
+                    Challenge3(line)
+        except FileNotFoundError:
+            print(f"Erreur : fichier {data_file} introuvable.")
+        
 
 
 def main():
-    Set1()
+    Challenge4()
 
 if __name__ == "__main__":
     main()
