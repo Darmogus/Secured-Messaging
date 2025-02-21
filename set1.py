@@ -1,7 +1,3 @@
-# --- External librairies ---
-import nltk
-from nltk.corpus import words
-
 
 class Challenge1:
     """Hex to Base64"""
@@ -113,12 +109,27 @@ class Challenge4:
                         print(result)
         except FileNotFoundError:
             print(f"Erreur : fichier {data_file} introuvable.")
-        
+            
+
+class Challenge5:
+    def __init__(self, plaintext, key):
+        self.plaintext = plaintext
+        self.key = key
+
+    def repeating_key_xor(self):
+        ciphertext = bytearray()
+        key_length = len(self.key)
+
+        for i, char in enumerate(self.plaintext):
+            ciphertext.append(ord(char) ^ ord(self.key[i % key_length]))  # XOR avec la clé répétée
+
+        return ciphertext.hex()
 
 
 def main():
     print(Challenge3().decrypt_xor_cipher())
     print(Challenge4())
+    print(Challenge5("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal", "ICE").repeating_key_xor())
 
 if __name__ == "__main__":
     main()
