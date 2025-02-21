@@ -68,50 +68,57 @@ class Challenge2:
 
 
 class Challenge3:
-    def __init__(self, binString: str = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"):
-        nltk.download('words', quiet=True)
-        self.english_words = set(words.words()) 
-        
-        self.binString = binString
-        self.byte_data = bytes.fromhex(self.binString)
+    def __init__(self, hex_str = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"):
+        self.hex_str = hex_str
 
-        self.find_key()
-            
-    def is_mostly_english(self, text, threshold=0.4):
-        english_word_count = sum(1 for word in text if word.lower() in self.english_words)
-        return (english_word_count / len(text)) >= threshold
-            
-    def xor_message(self, key):
-        decodedString = ""
+    def hex_to_bytes(self):
+        return bytes.fromhex(self.hex_str)
 
-        for byte in self.byte_data:
-            decodedString += chr(byte ^ key)
+    def single_byte_xor(self, input_bytes, key):
+        return bytes([b ^ key for b in input_bytes])
 
-        if not all(char in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .',!?-" for char in decodedString):
-            return None
-        return decodedString
-    
-    def find_key(self):
-        for key in range(100):
-            decodedString: str = self.xor_message(key)
-            if decodedString:
-                print(f"Key {key}: {decodedString}")
-                
+    def score_text(self, text):
+        common_chars = "ETAOIN SHRDLU"
+        return sum(text.upper().count(c) for c in common_chars)
+
+    def decrypt_xor_cipher(self):
+        ciphertext = self.hex_to_bytes()
+        best_score = 0
+        best_plaintext = None
+        best_key = None
+
+        for key in range(256):
+            plaintext = self.single_byte_xor(ciphertext, key)
+            try:
+                decoded_text = plaintext.decode('utf-8')
+                score = self.score_text(decoded_text)
+                if score > best_score:
+                    best_score = score
+                    best_plaintext = decoded_text
+                    best_key = key
+            except UnicodeDecodeError:
+                continue
+
+        return best_key, best_plaintext
+               
 
 class Challenge4:
     def __init__(self, data_file: str = "set1_chall4_data.txt"):
         try:
             with open(data_file, 'r') as file:
                 for line in file:
-                    strippedLine: str = line.strip()
-                    Challenge3(line)
+                    challenge = Challenge3(line)
+                    result = challenge.decrypt_xor_cipher()
+                    if result[0] is not None:
+                        print(result)
         except FileNotFoundError:
             print(f"Erreur : fichier {data_file} introuvable.")
         
 
 
 def main():
-    Challenge4()
+    print(Challenge3().decrypt_xor_cipher())
+    print(Challenge4())
 
 if __name__ == "__main__":
     main()
