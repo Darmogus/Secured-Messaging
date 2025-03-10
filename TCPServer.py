@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # --- Internal Libraries ---
-from encrypt import EncryptAES
+from crypt import EncryptAES
 
 
 class Server:

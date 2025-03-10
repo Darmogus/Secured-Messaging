@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # --- Internal Libraries ---
-from encrypt import Encrypt, Decrypt, DecryptAES
+from crypt import Encrypt, Decrypt, DecryptAES
 
 
 class Client:
