@@ -3,7 +3,6 @@ import socket
 import threading
 import sys
 
-# --- Cryptography for ECDH ---
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF

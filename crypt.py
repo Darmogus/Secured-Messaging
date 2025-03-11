@@ -1,10 +1,6 @@
 # --- External librairies ---
 import itertools
 import string
-
-
-# --- Classes ---
-# --- External librairies ---
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
