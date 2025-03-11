@@ -6,7 +6,6 @@ import string
 # --- Classes ---
 # --- External librairies ---
 import os
-import cryptography
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 

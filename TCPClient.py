@@ -1,5 +1,4 @@
 # --- External Libraries ---
-import os
 import socket
 import threading
 import sys
@@ -29,7 +28,7 @@ class Client:
         threading.Thread(target=self.receive_messages, daemon=True).start()
 
     def generate_symetric_key(self):
-        """Trade DH keys with the server and generate the symetric key."""
+        """Trade keys with the server and generate the symetric key."""
         # Receiving server public key
         server_public_bytes = self.clientSocket.recv(1024)
         server_public_key = serialization.load_pem_public_key(server_public_bytes)
