@@ -114,7 +114,7 @@ class Vigenere:
         print("[*] Running Vigenere...")
         print("============================================")
         keys = self.solve_key(min_key_size, max_key_size)
-        print(Decrypt.vigenere(encrypted_text, keys[0]))
+        print(Decrypt.vigenere(self.encrypted_text, keys[0]))
         print("============================================")
         print(f"[+] Key found: '{keys[0]}'")
     
