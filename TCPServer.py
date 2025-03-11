@@ -2,7 +2,6 @@
 import os
 import socket
 import threading
-from dotenv import load_dotenv
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -22,7 +21,7 @@ class Server:
         self.clients: dict[str, socket.socket] = {}
         self.running = False
 
-        self.symetricKey: str = os.getenv("SYMETRIC_KEY")
+        self.symetricKey: str = "secretkey"
 
     def generate_symetric_key(self, clientSocket: socket.socket):
         """Trade DH keys with the client and generate the symetric key."""
@@ -138,6 +137,5 @@ class Server:
 
 # --- Exécution du serveur ---
 if __name__ == "__main__":
-    load_dotenv()
-    server = Server(host='0.0.0.0', port=int(os.getenv("PORT")))
+    server = Server(host='0.0.0.0', port=12345)
     server.run()

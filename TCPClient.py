@@ -3,7 +3,6 @@ import os
 import socket
 import threading
 import sys
-from dotenv import load_dotenv
 
 # --- Cryptography for ECDH ---
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -104,9 +103,8 @@ class Client:
 
 # --- Exécution du client ---
 if __name__ == "__main__":
-    load_dotenv()
     try:
-        client = Client(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
+        client = Client(host="10.1.42.222", port=12345)
         client.run()
     except KeyboardInterrupt:
         print("\nClient stopped.")
