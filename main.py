@@ -23,16 +23,19 @@ class Cesar:
     def run(self):
         os.system("cls")
         print("[*] Running Cesar...")
+        print("============================================")
         message_found = False
         for key in range(1, 26):
             decrypted_text = Decrypt.cesar(self.encrypted_text, key)
-            words = decrypted_text.split(" ")
-            if len([word for word in words if word in self.words]) / len(words) >= 0.7:
-                print(f"[+] Key found - Key {key}: {decrypted_text}.")
+            if self.is_text_english(decrypted_text, 0.7):
+                print(decrypted_text)
+                print("============================================")
+                print(f"[+] Key found: '{key}'")
                 message_found = True
+                break
         if not message_found:
             print("[-] No key found.")
-            
+
 
 class Vigenere:
     ENGLISH_FREQUENCIES = {'a': 0.0749, 'b': 0.0129, 'c': 0.0354, 'd': 0.0362, 'e': 0.1400, 'f': 0.0218, 
@@ -116,6 +119,11 @@ class Vigenere:
         print(f"[+] Key found: '{keys[0]}'")
     
 if __name__ == "__main__":
-    encrypted_text: str = str(input("Entrez votre texte chiffré avec Vigenere : ")
-    v = Vigenere(encrypted_text)
-    v.run()
+    encrypted_text: str = str(input("Entrez votre texte chiffré avec Vigenere : "))
+    encrypt_method: str = str(input("Entrez la méthode de chiffrement (cesar/vigenere) : "))
+    if encrypt_method.lower == "cesar":
+        c = Cesar(encrypted_text)
+        c.run()
+    else:
+        v = Vigenere(encrypted_text)
+        v.run()
