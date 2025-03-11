@@ -6,7 +6,7 @@ import sys
 from dotenv import load_dotenv
 
 # --- Internal Libraries ---
-from encrypt import Encrypt, Decrypt
+from crypt import Encrypt, Decrypt
 
 
 # --- Client Class ---
@@ -75,7 +75,7 @@ class Client:
 if __name__ == "__main__":
     load_dotenv()
     try:
-        client = Client(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
+        client = Client(host="10.1.42.222", port=12345)
         client.run()
     except KeyboardInterrupt:
         print("\nArrêt du client.")

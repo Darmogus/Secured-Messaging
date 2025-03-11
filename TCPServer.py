@@ -5,7 +5,7 @@ import threading
 from dotenv import load_dotenv
 
 # --- Internal Libraries ---
-from encrypt import Encrypt, Decrypt
+from crypt import Encrypt, Decrypt
 
 # TODO : lorsqu'un utilisateur se déconnecte, envoyer un message sur le groupe pour informer les autres utilisateurs
 
@@ -109,5 +109,5 @@ class Server:
 # --- Tests ---
 if __name__ == "__main__":
     load_dotenv()
-    server = Server(host='0.0.0.0', port=int(os.getenv("PORT")))
+    server = Server(host='0.0.0.0', port=12345)
     server.run()
