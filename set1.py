@@ -71,14 +71,14 @@ class Challenge2(Challenge):
 
 
 class Challenge3(Challenge):
-    def __init__(self, usedElsewhere: bool = False):
+    def __init__(self, hex_string: str, usedElsewhere: bool = False):
         super().__init__(3) if not usedElsewhere else None
-        self.hexStr = hexStr
+        self.hex_string = hex_string
         
         print(self.decrypt_xor_cipher()) if not usedElsewhere else None
 
     def hex_to_bytes(self):
-        return bytes.fromhex(self.hexStr)
+        return bytes.fromhex(self.hex_string)
 
     def single_byte_xor(self, input_bytes, key):
         return bytes([b ^ key for b in input_bytes])
