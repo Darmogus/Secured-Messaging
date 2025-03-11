@@ -1,9 +1,7 @@
 # --- External Libraries ---
-import os
 import socket
 import threading
 import json
-from dotenv import load_dotenv
 
 # --- Server Class ---
 class Server:
@@ -33,7 +31,7 @@ class Server:
     def broadcast_message(self, sender_name: str, message: str):
         """Diffuse un message en clair à tous les clients (si besoin)."""
         fullMessage = f"{sender_name}: {message}"
-        print(fullMessage)
+        print(f"Broadcasting: {fullMessage}")
         for clientName, client in self.clients.items():
             if clientName != sender_name:
                 try:
@@ -138,6 +136,5 @@ class Server:
 
 # --- Lancement du Serveur ---
 if __name__ == "__main__":
-    load_dotenv()
-    server = Server(host='0.0.0.0', port=int(os.getenv("PORT")))
+    server = Server(host='0.0.0.0', port=12345)
     server.run()

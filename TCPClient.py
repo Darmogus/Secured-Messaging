@@ -6,7 +6,6 @@ import sys
 import json
 import base64
 import queue
-from dotenv import load_dotenv
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
@@ -86,7 +85,6 @@ class Client:
                         sender = payload.get("sender")
                         enc_b64 = payload.get("message")
                         encrypted_bytes = base64.b64decode(enc_b64)
-                        print(f"\nMessage chiffré : {encrypted_bytes}.")
                         decrypted_message = self.decrypt_message(encrypted_bytes)
                         print(f"\n{sender}: {decrypted_message}")
                     else:
@@ -155,9 +153,8 @@ class Client:
 
 # --- Lancement du Client ---
 if __name__ == "__main__":
-    load_dotenv()
     try:
-        client = Client(host=os.getenv("HOST"), port=int(os.getenv("PORT")))
+        client = Client(host="10.1.42.222", port=12345)
         client.run()
     except KeyboardInterrupt:
         print("\nArrêt du client.")
